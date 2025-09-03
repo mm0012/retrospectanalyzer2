@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  retros    Retro[]
+}
+
+model Retro {
+  id        String    @id @default(uuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  rawText   String
+  createdAt DateTime  @default(now())
+  analysis  Analysis?
+  @@index([userId])
+}
+
+model Analysis {
+  id         String   @id @default(uuid())
+  retroId    String   @unique
+  retro      Retro    @relation(fields: [retroId], references: [id])
+  narrative  Json
+  analysis   Json
+  createdAt  DateTime @default(now())
+}
+
+
+
+
+
+
+
