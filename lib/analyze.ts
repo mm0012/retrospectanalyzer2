@@ -2,8 +2,8 @@ import type { AnalyzeResult, NarrativePayload, AnalysisPayload } from "@/lib/typ
 import fs from "node:fs";
 import path from "node:path";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
 function readPrompt(file: string): string {
   try {
