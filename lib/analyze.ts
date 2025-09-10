@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
 
 function readPrompt(file: string): string {
   try {
@@ -128,8 +128,10 @@ async function callOpenAI(prompt: string, rawText: string): Promise<any | undefi
       const errorText = await resp.text();
       console.log("❌ OpenAI API 응답 오류:", { 
         status: resp.status, 
-        statusText: resp.statusText, 
-        error: errorText 
+        statusText: resp.statusText,
+        error: errorText,
+        model: OPENAI_MODEL,
+        hasApiKey: !!OPENAI_API_KEY
       });
       return undefined;
     }
@@ -250,7 +252,13 @@ function ensureAnalysisShape(v: any): AnalysisPayload {
 }
 
 export async function analyze(rawText: string): Promise<AnalyzeResult> {
-  console.log("🔍 분석 시작:", { textLength: rawText.length, hasApiKey: !!OPENAI_API_KEY });
+  console.log("🔍 분석 시작:", { 
+    textLength: rawText.length, 
+    hasApiKey: !!OPENAI_API_KEY,
+    apiKeyPrefix: OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 10) + "..." : "없음",
+    model: OPENAI_MODEL,
+    nodeEnv: process.env.NODE_ENV
+  });
   
   const narrativePrompt = readPrompt("narrative.prompt.md");
   const analysisPrompt = readPrompt("analysis.prompt.md");
