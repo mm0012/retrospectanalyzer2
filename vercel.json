@@ -5,9 +5,14 @@
     },
     "app/api/report/[id]/route.ts": {
       "maxDuration": 10
+    },
+    "app/api/test/route.ts": {
+      "maxDuration": 10
     }
   },
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next"
 }
