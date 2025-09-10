@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Tabs from "@/components/Tabs";
 import { useRouter } from "next/navigation";
 
@@ -299,11 +299,23 @@ function EncouragementCard({ title, content, emoji }: { title: string; content: 
 }
 
 export default function ReportPage({ params }: Props) {
-  const { id } = use(params);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [payload, setPayload] = useState<any | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+    resolveParams();
+  }, [params]);
+
+  const id = resolvedParams?.id;
+
+  useEffect(() => {
+    if (!id) return;
+    
     const fetchFromApi = async () => {
       try {
         console.log('Fetching report for ID:', id);
