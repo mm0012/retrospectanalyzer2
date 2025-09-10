@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5-2025-08-07";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
 function readPrompt(file: string): string {
   try {
@@ -46,7 +46,7 @@ const DEFAULTS = {
     emotion_tags: ["#긴장", "#자극", "#성취감", "#위로", "#성장"],
     hidden_theme:
       "자신을 낮게 평가하는 습관과, 그럼에도 성장하려는 의지 사이의 균형을 찾는 여정",
-    life_scores: { work: 7, health: 8, relationships: 7.5, sleep: 5, emotions: 6 },
+    life_scores: { work: 7, health: 8, relationships: 7.5, sleep: 5 },
     todos: [
       "수면 시간 6시간 이상 확보하고 낮잠 30분 제한 유지",
       "자기 표현을 자신감 있게 하는 연습",
@@ -189,7 +189,6 @@ function ensureAnalysisShape(v: any): AnalysisPayload {
         health: Number(v.life_scores?.health ?? d.life_scores.health),
         relationships: Number(v.life_scores?.relationships ?? d.life_scores.relationships),
         sleep: Number(v.life_scores?.sleep ?? d.life_scores.sleep),
-        emotions: Number(v.life_scores?.emotions ?? d.life_scores.emotions),
       },
       todos: Array.isArray(v.todos) ? v.todos.map((x: any) => String(x)) : d.todos,
       insights: {
@@ -251,17 +250,36 @@ function ensureAnalysisShape(v: any): AnalysisPayload {
 }
 
 export async function analyze(rawText: string): Promise<AnalyzeResult> {
+  console.log("🔍 분석 시작:", { textLength: rawText.length, hasApiKey: !!OPENAI_API_KEY });
+  
   const narrativePrompt = readPrompt("narrative.prompt.md");
   const analysisPrompt = readPrompt("analysis.prompt.md");
 
+  if (!narrativePrompt || !analysisPrompt) {
+    console.log("❌ 프롬프트 파일을 읽을 수 없음");
+    return { 
+      narrative: DEFAULTS.narrative(), 
+      analysis: DEFAULTS.analysis() 
+    };
+  }
+
   // 1) Narrative call
+  console.log("📝 서술형 분석 시작");
   const narJson = await callOpenAI(narrativePrompt, rawText);
+  if (!narJson) {
+    console.log("❌ 서술형 분석 실패 - 기본값 사용");
+  }
   const narrative = ensureNarrativeShape(narJson);
 
   // 2) Analysis call
+  console.log("📊 대시보드 분석 시작");
   const anaJson = await callOpenAI(analysisPrompt, rawText);
+  if (!anaJson) {
+    console.log("❌ 대시보드 분석 실패 - 기본값 사용");
+  }
   const analysis = ensureAnalysisShape(anaJson);
 
+  console.log("✅ 분석 완료");
   return { narrative, analysis } as AnalyzeResult;
 }
 
