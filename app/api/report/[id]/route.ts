@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+// OPTIONS 메서드 지원 (CORS)
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 200 });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('Report API called with method:', request.method);
+    console.log('Request URL:', request.url);
+    
     const { id } = await params;
+    console.log('Report ID:', id);
     
     // 데이터베이스 연결 시도
     try {

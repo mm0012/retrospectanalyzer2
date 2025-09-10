@@ -306,13 +306,18 @@ export default function ReportPage({ params }: Props) {
   useEffect(() => {
     const fetchFromApi = async () => {
       try {
+        console.log('Fetching report for ID:', id);
         const res = await fetch(`/api/report/${id}`);
+        console.log('Report API response status:', res.status);
+        
         if (res.ok) {
           const data = await res.json();
+          console.log('Report data received:', data);
           setPayload(data);
           return;
         } else {
-          console.warn(`API returned ${res.status}: ${res.statusText}`);
+          const errorText = await res.text();
+          console.warn(`API returned ${res.status}: ${res.statusText}`, errorText);
         }
       } catch (error) {
         console.warn('API fetch failed:', error);

@@ -15,11 +15,15 @@ export default function HomePage() {
     setIsAnalyzing(true);
     
     try {
+      console.log('Sending analyze request...');
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ raw_text: rawText }),
       });
+
+      console.log('Analyze response status:', res.status);
+      console.log('Analyze response headers:', res.headers);
 
       if (res.ok) {
         const reportId = res.headers.get("X-Report-Id") || Date.now().toString();
@@ -32,6 +36,9 @@ export default function HomePage() {
         
         // 리포트 페이지로 이동
         router.push(`/report/${reportId}`);
+      } else {
+        const errorText = await res.text();
+        console.error("분석 API 오류:", res.status, errorText);
       }
     } catch (error) {
       console.error("분석 중 오류 발생:", error);

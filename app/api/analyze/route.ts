@@ -2,8 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { analyze } from "@/lib/analyze";
 import { prisma } from "@/lib/db";
 
+// OPTIONS 메서드 지원 (CORS)
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
   try {
+    console.log('Analyze API called with method:', request.method);
+    console.log('Request URL:', request.url);
+    
     const body = await request.json();
     const raw = String(body?.raw_text ?? "");
     
