@@ -46,7 +46,7 @@ const DEFAULTS = {
     emotion_tags: ["#긴장", "#자극", "#성취감", "#위로", "#성장"],
     hidden_theme:
       "자신을 낮게 평가하는 습관과, 그럼에도 성장하려는 의지 사이의 균형을 찾는 여정",
-    life_scores: { work: 7, health: 8, relationships: 7.5, sleep: 5 },
+    life_scores: { work: 7, health: 8, relationships: 7.5, sleep: 5, emotions: 6 },
     todos: [
       "수면 시간 6시간 이상 확보하고 낮잠 30분 제한 유지",
       "자기 표현을 자신감 있게 하는 연습",
@@ -189,6 +189,7 @@ function ensureAnalysisShape(v: any): AnalysisPayload {
         health: Number(v.life_scores?.health ?? d.life_scores.health),
         relationships: Number(v.life_scores?.relationships ?? d.life_scores.relationships),
         sleep: Number(v.life_scores?.sleep ?? d.life_scores.sleep),
+        emotions: Number(v.life_scores?.emotions ?? d.life_scores.emotions),
       },
       todos: Array.isArray(v.todos) ? v.todos.map((x: any) => String(x)) : d.todos,
       insights: {

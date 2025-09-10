@@ -14,7 +14,7 @@ AI 기반 회고 분석 도구로, 회고 텍스트를 입력하면 인사이트
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Styling**: Tailwind CSS
 - **AI**: OpenAI GPT API
-- **Database**: Prisma (SQLite)
+- **Database**: Prisma (PostgreSQL) - 선택사항
 - **Deployment**: Vercel (권장)
 
 ## 📦 설치 및 실행
@@ -35,6 +35,9 @@ npm install
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4o-mini
+
+# 데이터베이스 (선택사항 - 없어도 작동함)
+DATABASE_URL=postgresql://username:password@host:port/database
 ```
 
 ### 4. 개발 서버 실행
@@ -43,6 +46,32 @@ npm run dev
 ```
 
 브라우저에서 `http://localhost:3000`으로 접속하세요.
+
+## 🚀 Vercel 배포
+
+### 1. GitHub에 코드 업로드
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git push -u origin main
+```
+
+### 2. Vercel 배포
+1. [Vercel](https://vercel.com)에 로그인
+2. "New Project" 클릭
+3. GitHub 저장소 연결
+4. 환경 변수 설정:
+   - `OPENAI_API_KEY`: OpenAI API 키
+   - `OPENAI_MODEL`: gpt-4o-mini (기본값)
+   - `DATABASE_URL`: (선택사항) PostgreSQL 연결 문자열
+5. "Deploy" 클릭
+
+### 3. 배포 후 확인사항
+- 분석 기능이 정상 작동하는지 확인
+- 결과 페이지가 제대로 표시되는지 확인
+- 데이터베이스 없이도 세션 기반으로 작동하는지 확인
 
 ## 🔧 사용법
 

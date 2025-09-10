@@ -26,8 +26,9 @@ export async function POST(request: NextRequest) {
       const response = NextResponse.json(result);
       response.headers.set("X-Report-Id", retro.id);
       return response;
-    } catch {
+    } catch (dbError) {
       // DB 미설정/오류 시 저장을 건너뛰고 결과만 반환
+      console.warn('Database save failed, returning result without saving:', dbError);
       return NextResponse.json(result);
     }
   } catch (err: any) {

@@ -25,8 +25,10 @@ export default function HomePage() {
         const reportId = res.headers.get("X-Report-Id") || Date.now().toString();
         const data = await res.json();
         
-        // 세션에 저장
-        sessionStorage.setItem("lastReport", JSON.stringify({ id: reportId, data }));
+        // 세션과 로컬 스토리지에 모두 저장 (Vercel 배포 시 안정성을 위해)
+        const reportData = { id: reportId, data };
+        sessionStorage.setItem("lastReport", JSON.stringify(reportData));
+        localStorage.setItem("lastReport", JSON.stringify(reportData));
         
         // 리포트 페이지로 이동
         router.push(`/report/${reportId}`);

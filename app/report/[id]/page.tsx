@@ -114,9 +114,98 @@ function SubSectionHeader({ emoji, title }: { emoji: string; title: string }) {
   );
 }
 
+// 점수 표시 여부 판단 함수
+function shouldShowScore(area: string, analysis: any, narrative: any): boolean {
+  const sections = narrative?.sections || [];
+  
+  switch (area) {
+    case 'work':
+      // 일/커리어 관련 섹션이 있고 내용이 충분한지 확인
+      const workSection = sections.find((s: any) => 
+        s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습')
+      );
+      return workSection && workSection.body && workSection.body.length > 10;
+      
+    case 'health':
+      // 건강/운동 관련 섹션이 있고 내용이 충분한지 확인
+      const healthSection = sections.find((s: any) => 
+        s.title?.includes('운동') || s.title?.includes('몸') || s.title?.includes('건강') || s.title?.includes('수면')
+      );
+      return healthSection && healthSection.body && healthSection.body.length > 10;
+      
+    case 'relationships':
+      // 관계 관련 섹션이 있고 내용이 충분한지 확인
+      const relationshipSection = sections.find((s: any) => 
+        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서')
+      );
+      return relationshipSection && relationshipSection.body && relationshipSection.body.length > 10;
+      
+    case 'emotions':
+      // 감정 관련 섹션이 있고 내용이 충분한지 확인
+      const emotionSection = sections.find((s: any) => 
+        s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장')
+      );
+      return emotionSection && emotionSection.body && emotionSection.body.length > 10;
+      
+    default:
+      return false;
+  }
+}
+
+// Life Score 설명 생성 함수
+function generateLifeScoreDescription(area: string, analysis: any, narrative: any): string {
+  const sections = narrative?.sections || [];
+  
+  switch (area) {
+    case 'work':
+      // 일/커리어 관련 섹션 찾기
+      const workSection = sections.find((s: any) => 
+        s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습')
+      );
+      if (workSection) {
+        return workSection.body?.substring(0, 30) + '...' || '일과 커리어 내용 부족';
+      }
+      return '일과 커리어 내용 부족';
+      
+    case 'health':
+      // 건강/운동 관련 섹션 찾기
+      const healthSection = sections.find((s: any) => 
+        s.title?.includes('운동') || s.title?.includes('몸') || s.title?.includes('건강') || s.title?.includes('수면')
+      );
+      if (healthSection) {
+        return healthSection.body?.substring(0, 30) + '...' || '건강과 운동 내용 부족';
+      }
+      return '건강과 운동 내용 부족';
+      
+    case 'relationships':
+      // 관계 관련 섹션 찾기
+      const relationshipSection = sections.find((s: any) => 
+        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서')
+      );
+      if (relationshipSection) {
+        return relationshipSection.body?.substring(0, 30) + '...' || '관계와 소통 내용 부족';
+      }
+      return '관계와 소통 내용 부족';
+      
+    case 'emotions':
+      // 감정 관련 섹션 찾기
+      const emotionSection = sections.find((s: any) => 
+        s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장')
+      );
+      if (emotionSection) {
+        return emotionSection.body?.substring(0, 30) + '...' || '감정과 자기표현 내용 부족';
+      }
+      return '감정과 자기표현 내용 부족';
+      
+    default:
+      return '해당 영역에 대한 내용이 부족합니다';
+  }
+}
+
 // 원형 점수 컴포넌트 (간단한 구조)
-function CircularScore({ title, score, description, emoji }: { title: string; score: number; description: string; emoji: string }) {
-  const percentage = (score / 10) * 100;
+function CircularScore({ title, score, description, emoji }: { title: string; score: number | null; description: string; emoji: string }) {
+  const displayScore = score !== null ? score : '?';
+  const percentage = score !== null ? (score / 10) * 100 : 0;
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -141,23 +230,27 @@ function CircularScore({ title, score, description, emoji }: { title: string; sc
               stroke="#F1F5F9"
               strokeWidth="8"
             />
-            {/* 진행률 원 */}
-            <circle
-              cx="50"
-              cy="50"
-              r={radius}
-              fill="none"
-              stroke="#1D293D"
-              strokeWidth="8"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-            />
+            {/* 진행률 원 - 점수가 있을 때만 표시 */}
+            {score !== null && (
+              <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke="#1D293D"
+                strokeWidth="8"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="round"
+              />
+            )}
           </svg>
           {/* 중앙 텍스트 */}
           <div className="absolute flex items-center justify-center">
-            <span className="font-pretendard font-medium text-[#1d293d] text-[20px] leading-[28px]">{score}</span>
-            <span className="font-pretendard font-normal text-[#90a1b9] text-[12px] leading-[16px]">/10</span>
+            <span className="font-pretendard font-medium text-[#1d293d] text-[20px] leading-[28px]">{displayScore}</span>
+            {score !== null && (
+              <span className="font-pretendard font-normal text-[#90a1b9] text-[12px] leading-[16px]">/10</span>
+            )}
           </div>
         </div>
         <div className="font-pretendard font-normal text-[#62748e] text-[14px] text-center leading-[20px]">
@@ -218,16 +311,40 @@ export default function ReportPage({ params }: Props) {
           const data = await res.json();
           setPayload(data);
           return;
+        } else {
+          console.warn(`API returned ${res.status}: ${res.statusText}`);
         }
-      } catch {}
+      } catch (error) {
+        console.warn('API fetch failed:', error);
+      }
+      
       // fallback to session (older flow)
       const raw = sessionStorage.getItem("lastReport");
       if (raw) {
         try {
           const obj = JSON.parse(raw);
           // id가 달라도 세션의 최신 결과를 우선 표시
-          if (obj?.data) setPayload(obj.data);
-        } catch {}
+          if (obj?.data) {
+            setPayload(obj.data);
+            return;
+          }
+        } catch (error) {
+          console.warn('Session storage parse failed:', error);
+        }
+      }
+      
+      // 마지막 fallback: localStorage에서 시도
+      const localRaw = localStorage.getItem("lastReport");
+      if (localRaw) {
+        try {
+          const obj = JSON.parse(localRaw);
+          if (obj?.data) {
+            setPayload(obj.data);
+            return;
+          }
+        } catch (error) {
+          console.warn('Local storage parse failed:', error);
+        }
       }
     };
     fetchFromApi();
@@ -351,26 +468,26 @@ export default function ReportPage({ params }: Props) {
                         <CircularScore 
                           title="일/커리어" 
                           emoji="💼"
-                          score={a.life_scores.work} 
-                          description="기술 학습으로 꾸준한 발전 및 컨텐츠 공유에서 위로와 인사이트"
+                          score={shouldShowScore('work', a, payload.narrative) ? a.life_scores?.work : null} 
+                          description={generateLifeScoreDescription('work', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="몸/건강" 
                           emoji="🧘‍♀️"
-                          score={a.life_scores.health} 
-                          description="헬스 2회, 러닝 1회, 클라이밍 1회로 다양한 운동 시도"
+                          score={shouldShowScore('health', a, payload.narrative) ? a.life_scores?.health : null} 
+                          description={generateLifeScoreDescription('health', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="관계" 
                           emoji="👥"
-                          score={a.life_scores.relationships} 
-                          description="트레바리 모임에서 깊은 대화와 공감 경험"
+                          score={shouldShowScore('relationships', a, payload.narrative) ? a.life_scores?.relationships : null} 
+                          description={generateLifeScoreDescription('relationships', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="감정" 
                           emoji="❤️"
-                          score={6} 
-                          description="자기표현에 대한 새로운 관점과 성장 의지"
+                          score={shouldShowScore('emotions', a, payload.narrative) ? a.life_scores?.emotions : null} 
+                          description={generateLifeScoreDescription('emotions', a, payload.narrative)}
                         />
                       </div>
                     </DashboardCard>

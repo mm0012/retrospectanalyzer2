@@ -21,6 +21,7 @@ export interface AnalysisPayload {
     health: number;
     relationships: number;
     sleep: number;
+    emotions?: number;
   };
   todos: string[];
   insights: {
