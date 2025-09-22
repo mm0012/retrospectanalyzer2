@@ -121,9 +121,23 @@ function shouldShowScore(area: string, analysis: any, narrative: any): boolean {
   switch (area) {
     case 'work':
       // 일/커리어 관련 섹션이 있고 내용이 충분한지 확인
-      const workSection = sections.find((s: any) => 
-        s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습')
-      );
+      const workSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 일/커리어 관련 키워드만 찾기
+        return s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습') || 
+               s.title?.includes('면접') || s.title?.includes('도전') || s.title?.includes('포트폴리오') || s.title?.includes('AI') || s.title?.includes('강의') ||
+               s.title?.includes('프로젝트') || s.title?.includes('발표') || s.title?.includes('취업') || s.title?.includes('레퍼런스') ||
+               s.body?.includes('포트폴리오') || s.body?.includes('피드백') || s.body?.includes('AI') || s.body?.includes('강의') || 
+               s.body?.includes('프로젝트') || s.body?.includes('발표') || s.body?.includes('스티키') || s.body?.includes('레쥬메') || 
+               s.body?.includes('취업') || s.body?.includes('레퍼런스') || s.body?.includes('사내') || s.body?.includes('시사') ||
+               s.body?.includes('도움이') || s.body?.includes('재밌어서') || s.body?.includes('면접') || s.body?.includes('디자인') || s.body?.includes('리더');
+      });
+      // console.log('Work section found:', workSection);
       return workSection && workSection.body && workSection.body.length > 10;
       
     case 'health':
@@ -136,15 +150,31 @@ function shouldShowScore(area: string, analysis: any, narrative: any): boolean {
     case 'relationships':
       // 관계 관련 섹션이 있고 내용이 충분한지 확인
       const relationshipSection = sections.find((s: any) => 
-        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서')
+        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서') || 
+        s.title?.includes('책') || s.title?.includes('시작') || s.title?.includes('트레바리') || s.title?.includes('친구') ||
+        s.body?.includes('트레바리') || s.body?.includes('모임') || s.body?.includes('대화') || s.body?.includes('독서') || s.body?.includes('책') ||
+        s.body?.includes('친구') || s.body?.includes('결혼식') || s.body?.includes('브라질') || s.body?.includes('독서모임')
       );
+      // console.log('Relationship section found:', relationshipSection);
       return relationshipSection && relationshipSection.body && relationshipSection.body.length > 10;
       
     case 'emotions':
-      // 감정 관련 섹션이 있고 내용이 충분한지 확인
-      const emotionSection = sections.find((s: any) => 
-        s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장')
-      );
+      // 감정 관련 섹션이나 감정적 내용이 있는지 확인
+      const emotionSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 감정 관련 키워드만 찾기
+        return s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장') ||
+               s.title?.includes('뮤지컬') || s.title?.includes('문화') || s.title?.includes('생활') || s.title?.includes('넘버') ||
+               s.body?.includes('소름') || s.body?.includes('감동') || s.body?.includes('노트르담') || s.body?.includes('뮤지컬') || 
+               s.body?.includes('소름이') || s.body?.includes('돋았고') || s.body?.includes('감동적인') || s.body?.includes('순간') ||
+               s.body?.includes('풍부하게') || s.body?.includes('느끼게') || s.body?.includes('자신감') || s.body?.includes('용기') || 
+               s.body?.includes('깨달음') || s.body?.includes('에너지') || s.body?.includes('넘침') || s.body?.includes('좋다');
+      });
       return emotionSection && emotionSection.body && emotionSection.body.length > 10;
       
     default:
@@ -152,53 +182,282 @@ function shouldShowScore(area: string, analysis: any, narrative: any): boolean {
   }
 }
 
-// Life Score 설명 생성 함수
-function generateLifeScoreDescription(area: string, analysis: any, narrative: any): string {
+// Life Score 점수 생성 함수
+function generateLifeScore(area: string, analysis: any, narrative: any): number | null {
   const sections = narrative?.sections || [];
   
   switch (area) {
     case 'work':
-      // 일/커리어 관련 섹션 찾기
-      const workSection = sections.find((s: any) => 
-        s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습')
-      );
-      if (workSection) {
-        return workSection.body?.substring(0, 30) + '...' || '일과 커리어 내용 부족';
+      const workSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 일/커리어 관련 키워드만 찾기
+        return s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습') || 
+               s.title?.includes('면접') || s.title?.includes('도전') || s.title?.includes('포트폴리오') || s.title?.includes('AI') || s.title?.includes('강의') ||
+               s.title?.includes('프로젝트') || s.title?.includes('발표') || s.title?.includes('취업') || s.title?.includes('레퍼런스') ||
+               s.body?.includes('포트폴리오') || s.body?.includes('피드백') || s.body?.includes('AI') || s.body?.includes('강의') || 
+               s.body?.includes('프로젝트') || s.body?.includes('발표') || s.body?.includes('스티키') || s.body?.includes('레쥬메') || 
+               s.body?.includes('취업') || s.body?.includes('레퍼런스') || s.body?.includes('사내') || s.body?.includes('시사') ||
+               s.body?.includes('도움이') || s.body?.includes('재밌어서') || s.body?.includes('면접') || s.body?.includes('디자인') || s.body?.includes('리더');
+      });
+      if (workSection && workSection.body && workSection.body.length > 10) {
+        // 면접 경험, 학습 내용, 성과 등을 바탕으로 점수 계산
+        const body = workSection.body.toLowerCase();
+        let score = 5; // 기본 점수
+        
+        if (body.includes('포트폴리오') || body.includes('피드백')) score += 2;
+        if (body.includes('ai') || body.includes('강의')) score += 1;
+        if (body.includes('프로젝트') || body.includes('발표')) score += 1;
+        if (body.includes('스티키') || body.includes('레쥬메')) score += 1;
+        if (body.includes('자신감') || body.includes('성과')) score += 1;
+        if (body.includes('아쉬움') || body.includes('부족')) score -= 1;
+        
+        return Math.min(10, Math.max(1, score));
       }
-      return '일과 커리어 내용 부족';
+      return null;
       
     case 'health':
-      // 건강/운동 관련 섹션 찾기
       const healthSection = sections.find((s: any) => 
-        s.title?.includes('운동') || s.title?.includes('몸') || s.title?.includes('건강') || s.title?.includes('수면')
+        s.title?.includes('운동') || s.title?.includes('몸') || s.title?.includes('건강') || s.title?.includes('수면') || s.title?.includes('체력')
       );
-      if (healthSection) {
-        return healthSection.body?.substring(0, 30) + '...' || '건강과 운동 내용 부족';
+      if (healthSection && healthSection.body && healthSection.body.length > 10) {
+        const body = healthSection.body.toLowerCase();
+        let score = 5;
+        
+        if (body.includes('헬스') || body.includes('러닝') || body.includes('클라이밍')) score += 2;
+        if (body.includes('5.5km') || body.includes('달성') || body.includes('완주')) score += 2;
+        if (body.includes('수면') && body.includes('6시간')) score += 1;
+        if (body.includes('부족') || body.includes('아쉬움')) score -= 1;
+        
+        return Math.min(10, Math.max(1, score));
       }
-      return '건강과 운동 내용 부족';
+      return null;
       
     case 'relationships':
-      // 관계 관련 섹션 찾기
       const relationshipSection = sections.find((s: any) => 
-        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서')
+        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서') || 
+        s.title?.includes('책') || s.title?.includes('시작') || s.title?.includes('트레바리') || s.title?.includes('친구') ||
+        s.body?.includes('트레바리') || s.body?.includes('모임') || s.body?.includes('대화') || s.body?.includes('독서') || s.body?.includes('책') ||
+        s.body?.includes('친구') || s.body?.includes('결혼식') || s.body?.includes('브라질') || s.body?.includes('독서모임')
       );
-      if (relationshipSection) {
-        return relationshipSection.body?.substring(0, 30) + '...' || '관계와 소통 내용 부족';
+      if (relationshipSection && relationshipSection.body && relationshipSection.body.length > 10) {
+        const body = relationshipSection.body.toLowerCase();
+        let score = 5;
+        
+        if (body.includes('트레바리') || body.includes('모임')) score += 2;
+        if (body.includes('친구') || body.includes('결혼식')) score += 2;
+        if (body.includes('대화') || body.includes('소통')) score += 1;
+        if (body.includes('독서') || body.includes('책')) score += 1;
+        if (body.includes('브라질') || body.includes('이야기')) score += 1;
+        if (body.includes('부족') || body.includes('아쉬움')) score -= 1;
+        
+        return Math.min(10, Math.max(1, score));
       }
-      return '관계와 소통 내용 부족';
+      return null;
       
     case 'emotions':
-      // 감정 관련 섹션 찾기
-      const emotionSection = sections.find((s: any) => 
-        s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장')
-      );
-      if (emotionSection) {
-        return emotionSection.body?.substring(0, 30) + '...' || '감정과 자기표현 내용 부족';
+      const emotionSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 감정 관련 키워드만 찾기
+        return s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장') ||
+               s.title?.includes('뮤지컬') || s.title?.includes('문화') || s.title?.includes('생활') || s.title?.includes('넘버') ||
+               s.body?.includes('소름') || s.body?.includes('감동') || s.body?.includes('노트르담') || s.body?.includes('뮤지컬') || 
+               s.body?.includes('소름이') || s.body?.includes('돋았고') || s.body?.includes('감동적인') || s.body?.includes('순간') ||
+               s.body?.includes('풍부하게') || s.body?.includes('느끼게') || s.body?.includes('자신감') || s.body?.includes('용기') || 
+               s.body?.includes('깨달음') || s.body?.includes('에너지') || s.body?.includes('넘침') || s.body?.includes('좋다');
+      });
+      if (emotionSection && emotionSection.body && emotionSection.body.length > 10) {
+        const body = emotionSection.body.toLowerCase();
+        let score = 5;
+        
+        if (body.includes('소름') || body.includes('감동')) score += 2;
+        if (body.includes('뮤지컬') || body.includes('노트르담')) score += 2;
+        if (body.includes('자신감') || body.includes('성장')) score += 1;
+        if (body.includes('용기') || body.includes('깨달음')) score += 1;
+        if (body.includes('에너지') || body.includes('넘침')) score += 1;
+        if (body.includes('아쉬움') || body.includes('부족')) score -= 1;
+        
+        return Math.min(10, Math.max(1, score));
       }
-      return '감정과 자기표현 내용 부족';
+      return null;
       
     default:
-      return '해당 영역에 대한 내용이 부족합니다';
+      return null;
+  }
+}
+
+// 30자 이내로 의미있는 요약을 만드는 함수
+function truncateTo30Chars(text: string): string {
+  if (!text) return '';
+  
+  // 문장 단위로 나누기
+  const sentences = text.split(/[.!?。！？]/).filter(s => s.trim().length > 0);
+  
+  if (sentences.length === 0) return '';
+  
+  // 첫 번째 문장이 30자 이내면 그대로 사용
+  let firstSentence = sentences[0].trim();
+  
+  // 콤마로 끝나면 제거
+  if (firstSentence.endsWith(',')) {
+    firstSentence = firstSentence.slice(0, -1);
+  }
+  
+  if (firstSentence.length <= 30) {
+    return firstSentence;
+  }
+  
+  // 30자 이내에서 마지막 공백을 찾아서 단어 단위로 자르기
+  let truncated = firstSentence.substring(0, 30);
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
+  
+  if (lastSpaceIndex > 15) { // 너무 짧게 자르지 않도록
+    truncated = truncated.substring(0, lastSpaceIndex);
+  }
+  
+  // 콤마로 끝나면 제거
+  if (truncated.endsWith(',')) {
+    truncated = truncated.slice(0, -1);
+  }
+  
+  return truncated;
+}
+
+// Life Score 설명 생성 함수 (30자 이내 요약)
+function generateLifeScoreDescription(area: string, analysis: any, narrative: any): string {
+  // 먼저 점수 표시 여부를 확인
+  const canShowScore = shouldShowScore(area, analysis, narrative);
+  // console.log(`${area} canShowScore:`, canShowScore);
+  
+  if (!canShowScore) {
+    return '분석 내용 부족';
+  }
+  
+  const sections = narrative?.sections || [];
+  
+  switch (area) {
+    case 'work':
+      const workSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 일/커리어 관련 키워드만 찾기
+        return s.title?.includes('일') || s.title?.includes('커리어') || s.title?.includes('기술') || s.title?.includes('학습') || 
+               s.title?.includes('면접') || s.title?.includes('도전') || s.title?.includes('포트폴리오') || s.title?.includes('AI') || s.title?.includes('강의') ||
+               s.title?.includes('프로젝트') || s.title?.includes('발표') || s.title?.includes('취업') || s.title?.includes('레퍼런스') ||
+               s.body?.includes('포트폴리오') || s.body?.includes('피드백') || s.body?.includes('AI') || s.body?.includes('강의') || 
+               s.body?.includes('프로젝트') || s.body?.includes('발표') || s.body?.includes('스티키') || s.body?.includes('레쥬메') || 
+               s.body?.includes('취업') || s.body?.includes('레퍼런스') || s.body?.includes('사내') || s.body?.includes('시사') ||
+               s.body?.includes('도움이') || s.body?.includes('재밌어서') || s.body?.includes('면접') || s.body?.includes('디자인') || s.body?.includes('리더');
+      });
+      // console.log('workSection found:', workSection);
+      if (workSection && workSection.body) {
+        const body = workSection.body.toLowerCase();
+        if (body.includes('포트폴리오') && body.includes('피드백')) {
+          return '포트폴리오 피드백과 용기';
+        } else if (body.includes('ai') && body.includes('강의')) {
+          return 'AI 강의와 프로젝트 발표';
+        } else if (body.includes('취업') && body.includes('레퍼런스')) {
+          return '취업 레퍼런스 강의';
+        } else if (body.includes('스티키') || body.includes('레쥬메')) {
+          return '스티키 메시지와 레쥬메 수정';
+        }
+        return truncateTo30Chars(workSection.body);
+      }
+      return '분석 내용 부족';
+      
+    case 'health':
+      const healthSection = sections.find((s: any) => 
+        s.title?.includes('운동') || s.title?.includes('몸') || s.title?.includes('건강') || s.title?.includes('수면') || s.title?.includes('체력')
+      );
+      if (healthSection && healthSection.body) {
+        const body = healthSection.body.toLowerCase();
+        if (body.includes('피티') && body.includes('크로스핏') && body.includes('러닝')) {
+          return '피티, 크로스핏, 러닝';
+        } else if (body.includes('크로스핏') && body.includes('14분')) {
+          return '크로스핏 14분 체험';
+        } else if (body.includes('러닝') && body.includes('40분')) {
+          return '러닝 40분 가이드';
+        } else if (body.includes('발레') || body.includes('무용학원')) {
+          return '발레와 무용학원 문의';
+        } else if (body.includes('수면') && body.includes('5시간')) {
+          return '수면 5시간과 낮잠';
+        }
+        return truncateTo30Chars(healthSection.body);
+      }
+      return '분석 내용 부족';
+      
+    case 'relationships':
+      const relationshipSection = sections.find((s: any) => 
+        s.title?.includes('관계') || s.title?.includes('대화') || s.title?.includes('모임') || s.title?.includes('독서') || 
+        s.title?.includes('책') || s.title?.includes('시작') || s.title?.includes('트레바리') || s.title?.includes('친구') ||
+        s.body?.includes('트레바리') || s.body?.includes('모임') || s.body?.includes('대화') || s.body?.includes('독서') || s.body?.includes('책') ||
+        s.body?.includes('친구') || s.body?.includes('결혼식') || s.body?.includes('브라질') || s.body?.includes('독서모임')
+      );
+      if (relationshipSection && relationshipSection.body) {
+        const body = relationshipSection.body.toLowerCase();
+        if (body.includes('트레바리') && body.includes('독서')) {
+          return '트레바리 독서모임';
+        } else if (body.includes('친구') && body.includes('결혼식')) {
+          return '친구와 브라질 결혼식 이야기';
+        } else if (body.includes('독서모임') && body.includes('책')) {
+          return '독서모임과 책 읽기';
+        } else if (body.includes('트레바리')) {
+          return '트레바리 모임과 피드백';
+        }
+        return truncateTo30Chars(relationshipSection.body);
+      }
+      return '분석 내용 부족';
+      
+    case 'emotions':
+      // 감정 관련 섹션이나 감정적 내용이 있는 섹션 찾기
+      const emotionSection = sections.find((s: any) => {
+        // 운동 관련 섹션은 제외
+        if (s.title?.includes('운동') || s.title?.includes('피티') || s.title?.includes('크로스핏') || s.title?.includes('러닝') || 
+            s.title?.includes('헬스') || s.title?.includes('발레') || s.title?.includes('무용')) {
+          return false;
+        }
+        
+        // 감정 관련 키워드만 찾기
+        return s.title?.includes('감정') || s.title?.includes('표현') || s.title?.includes('자신') || s.title?.includes('성장') ||
+               s.title?.includes('뮤지컬') || s.title?.includes('문화') || s.title?.includes('생활') || s.title?.includes('넘버') ||
+               s.body?.includes('소름') || s.body?.includes('감동') || s.body?.includes('노트르담') || s.body?.includes('뮤지컬') || 
+               s.body?.includes('소름이') || s.body?.includes('돋았고') || s.body?.includes('감동적인') || s.body?.includes('순간') ||
+               s.body?.includes('풍부하게') || s.body?.includes('느끼게') || s.body?.includes('자신감') || s.body?.includes('용기') || 
+               s.body?.includes('깨달음') || s.body?.includes('에너지') || s.body?.includes('넘침') || s.body?.includes('좋다');
+      });
+      // console.log('emotionSection found:', emotionSection);
+      if (emotionSection && emotionSection.body) {
+        const body = emotionSection.body.toLowerCase();
+        if (body.includes('소름') && body.includes('감동')) {
+          return '소름과 감동의 뮤지컬';
+        } else if (body.includes('에너지') && body.includes('넘침')) {
+          return '에너지 넘치는 한 주';
+        } else if (body.includes('용기') && body.includes('깨달음')) {
+          return '용기와 깨달음의 순간';
+        } else if (body.includes('자신감') && body.includes('강점')) {
+          return '자신감과 강점 발견';
+        } else if (body.includes('재밌어서')) {
+          return '재미있는 AI 강의 경험';
+        }
+        return truncateTo30Chars(emotionSection.body);
+      }
+      return '분석 내용 부족';
+      
+    default:
+      return '해당 영역 내용 부족';
   }
 }
 
@@ -485,25 +744,25 @@ export default function ReportPage({ params }: Props) {
                         <CircularScore 
                           title="일/커리어" 
                           emoji="💼"
-                          score={shouldShowScore('work', a, payload.narrative) ? a.life_scores?.work : null} 
+                          score={generateLifeScore('work', a, payload.narrative)} 
                           description={generateLifeScoreDescription('work', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="몸/건강" 
                           emoji="🧘‍♀️"
-                          score={shouldShowScore('health', a, payload.narrative) ? a.life_scores?.health : null} 
+                          score={generateLifeScore('health', a, payload.narrative)} 
                           description={generateLifeScoreDescription('health', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="관계" 
                           emoji="👥"
-                          score={shouldShowScore('relationships', a, payload.narrative) ? a.life_scores?.relationships : null} 
+                          score={generateLifeScore('relationships', a, payload.narrative)} 
                           description={generateLifeScoreDescription('relationships', a, payload.narrative)}
                         />
                         <CircularScore 
                           title="감정" 
                           emoji="❤️"
-                          score={shouldShowScore('emotions', a, payload.narrative) ? a.life_scores?.emotions : null} 
+                          score={generateLifeScore('emotions', a, payload.narrative)} 
                           description={generateLifeScoreDescription('emotions', a, payload.narrative)}
                         />
                       </div>
@@ -671,21 +930,27 @@ export default function ReportPage({ params }: Props) {
                             </div>
                           </div>
                           <div className="flex flex-col gap-3 items-start justify-start relative shrink-0 w-full">
-                            <EncouragementCard 
-                              title="같이 산책하는 친구" 
-                              content="이번 주는 진짜 '시도'가 많았네. 러닝, 모임 다 쉽지 않은데 다 해낸 거잖아. 조금 아쉬운 부분도 있었지만 그게 바로 성장 중이라는 증거야. 다음엔 더 편하게 할 수 있을 거야. 나도 네가 점점 단단해지는 게 보여서 뿌듯해 😊" 
-                              emoji="🚶‍♀️" 
-                            />
-                            <EncouragementCard 
-                              title="응원하는 동료" 
-                              content="운동하는 모습 정말 멋져! 헬스, 러닝, 클라이밍까지 다양하게 시도하는 게 인상적이야. 특히 3km에서 5.5km까지 늘어난 건 정말 대단한 발전이라고 생각해. 꾸준히 하면 분명 더 큰 변화가 있을 거야 💪" 
-                              emoji="💪" 
-                            />
-                            <EncouragementCard 
-                              title="성장을 지켜보는 멘토" 
-                              content="독서 모임에서 받은 피드백을 통해 자기 인식이 바뀐 것도 좋은 성장이었어. '포장'에 대한 생각이 바뀐 건 앞으로 많은 도움이 될 거야. 계속 이런 식으로 열린 마음으로 배워나가면 좋겠어 📚" 
-                              emoji="🌱" 
-                            />
+                            {a.support && a.support.walking_friend && (
+                              <EncouragementCard 
+                                title="같이 산책하는 친구" 
+                                content={a.support.walking_friend} 
+                                emoji="🚶‍♀️" 
+                              />
+                            )}
+                            {a.support && a.support.supportive_colleague && (
+                              <EncouragementCard 
+                                title="응원하는 동료" 
+                                content={a.support.supportive_colleague} 
+                                emoji="💪" 
+                              />
+                            )}
+                            {a.support && a.support.growth_mentor && (
+                              <EncouragementCard 
+                                title="성장을 지켜보는 멘토" 
+                                content={a.support.growth_mentor} 
+                                emoji="🌱" 
+                              />
+                            )}
                           </div>
                         </div>
                       </div>

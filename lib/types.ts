@@ -48,7 +48,11 @@ export interface AnalysisPayload {
   };
   qa: { q: string; a: string }[];
   quote: { text: string; author: string };
-  support: string;
+  support: {
+    walking_friend: string;
+    supportive_colleague: string;
+    growth_mentor: string;
+  };
   declaration: string;
 }
 

@@ -80,15 +80,9 @@ export default function HomePage() {
                   <TextEditor
                     value={rawText}
                     onChange={setRawText}
-                    placeholder="회고 원문을 입력하면 인사이트와 개선점을 분석해드립니다
-
-예시:
-- 이번 스프린트에서 잘했던 점
-- 아쉬웠던 점  
-- 개선이 필요한 부분
-- 다음에 시도해볼 것들"
+                    placeholder="회고 원문을 입력하면 인사이트와 개선점을 분석해드립니다 (예시: 이번 스프린트에서 잘했던 점, 아쉬웠던 점, 개선이 필요한 부분, 다음에 시도해볼 것들)"
                     disabled={isAnalyzing}
-                    className="box-border resize-none border-none bg-transparent outline-none w-full h-full p-5 font-pretendard font-normal text-[16px] text-gray-900 placeholder:text-[#99a1af] leading-[24px]"
+                    className="box-border resize-none border-none bg-transparent outline-none w-full h-full p-5 font-pretendard font-normal text-[16px] text-gray-900 leading-[24px]"
                     style={{ minHeight: '300px' }}
                   />
                 </div>
