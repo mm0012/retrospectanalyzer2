@@ -113,7 +113,8 @@ export default function HomePage() {
         {/* Info Section */}
         <div className="bg-slate-50 box-border flex gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[24px] shrink-0">
           <div className="font-pretendard font-normal leading-[0] not-italic relative shrink-0 text-[#99a1af] text-[14px] text-nowrap">
-            <p className="leading-[20px] whitespace-pre">회고 내용은 안전하게 처리되어 저장되지 않습니다.</p>
+            <p className="leading-[20px] whitespace-pre">회고 내용은 안전하게 처리되어 저장되지 않습니다.
+왜냐면.. 저장할 백이 없기 때문입니다.🙃</p>
           </div>
         </div>
         
